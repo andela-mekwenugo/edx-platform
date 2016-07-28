@@ -55,6 +55,18 @@
                         // Success callback
                         _.bind(function () {
                             this.hide();
+                            /*
+                            * `/certificates/regenerate` makes the certificate status to unavailable (if it exists)
+                            * and put a certificate request on the queue.
+                            * */
+                            $.ajax({
+                                url: '/certificates/regenerate',
+                                type: 'POST',
+                                data: {
+                                    username: this.enrollment.collection.user,
+                                    course_key: this.enrollment.get('course_id')
+                                }
+                            });
                         }, this),
                         // Error callback
                         _.bind(function () {

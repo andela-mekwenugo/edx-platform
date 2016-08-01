@@ -20,7 +20,7 @@
         ) {
             var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
-                showLoadingError, orderNumber;
+                showLoadingError, orderNumber, getUserField;
 
             accountSettingsElement = $('.wrapper-account-settings');
 
@@ -110,7 +110,7 @@
                             })
                         },
                         {
-                            view: new AccountSettingsFieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.TimeZoneFieldView({
                                 model: userPreferencesModel,
                                 required: true,
                                 title: gettext('Time Zone'),
@@ -168,6 +168,19 @@
                     ]
                 }
             ];
+
+            // set TimeZoneField to listen to CountryField
+            getUserField = function (list, search) {
+                return _.find(list, function (field) {
+                    return field.view.options.valueAttribute === search;
+                }).view;
+            };
+            var userFields = _.find(aboutSectionsData, function (section) {
+                return section.title === gettext('Basic Account Information');
+            }).fields;
+            var timeZoneDropdownField = getUserField(userFields, 'time_zone');
+            var countryDropdownField = getUserField(userFields, 'country');
+            timeZoneDropdownField.listenToCountryView(countryDropdownField);
 
             accountsSectionData = [
                 {

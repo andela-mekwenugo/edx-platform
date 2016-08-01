@@ -77,6 +77,46 @@
                 }
 
             }),
+            TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
+                fieldTemplate: field_dropdown_account_template,
+
+                initialize: function (options) {
+                    this.options = _.extend({}, options);
+                    _.bindAll(this, 'updateList', 'listenToCountryView');
+                    this._super(options);
+                },
+
+                listenToCountryView: function (view) {
+                    this.listenTo(view.model, 'change:country', this.updateList);
+                },
+
+                updateList: function (user) {
+                    var view = this;
+                    $.ajax({
+                        type: 'GET',
+                        url: '/user_api/v1/preferences/time_zones/',
+                        data: {'country_code': user.attributes.country},
+                        success: function (data) {
+                            var countryTimeZones = $.map(data, function (timeZoneInfo) {
+                                return [[timeZoneInfo.time_zone, timeZoneInfo.description]];
+                            });
+                            view.options.groupOptions = [
+                                {
+                                    'groupTitle': gettext("Country Time Zones"),
+                                    'selectOptions': countryTimeZones
+
+                                },
+                                {
+                                    'groupTitle': gettext("All Time Zones"),
+                                    'selectOptions': view.options.options
+                                }
+                            ];
+                            view.render();
+                        }
+                    });
+                }
+
+            }),
             PasswordFieldView: FieldViews.LinkFieldView.extend({
                 fieldType: 'button',
                 fieldTemplate: field_link_account_template,

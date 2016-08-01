@@ -368,8 +368,9 @@
                 'focusout select': 'finishEditing'
             },
 
-            initialize: function(options) {
-                _.bindAll(this, 'render', 'optionForValue', 'fieldValue', 'displayValue', 'updateValueInField', 'saveValue');
+            initialize: function (options) {
+                _.bindAll(this, 'render', 'optionForValue', 'fieldValue', 'displayValue', 'updateValueInField',
+                    'saveValue', 'createGroupOptions');
                 this._super(options);
 
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
@@ -385,7 +386,7 @@
                     titleVisible: this.options.titleVisible !== undefined ? this.options.titleVisible : true,
                     iconName: this.options.iconName,
                     showBlankOption: (!this.options.required || !this.modelValueIsSet()),
-                    selectOptions: this.options.options,
+                    groupOptions: this.createGroupOptions(),
                     message: this.helpMessage
                 }));
                 this.delegateEvents();
@@ -407,7 +408,17 @@
             },
 
             optionForValue: function(value) {
-                return _.find(this.options.options, function(option) { return option[0] === value; });
+                if (_.isUndefined(this.options.groupOptions)) {
+                    return _.find(this.options.options, function(option) { return option[0] === value; });
+                } else {
+                    var options = [];
+                    _.each(this.options.groupOptions, function (groupOption) {
+                        options = options.concat(groupOption.selectOptions);
+                    });
+                    return _.find(options, function (option) {
+                        return option[0] === value;
+                    });
+                }
             },
 
             fieldValue: function() {
@@ -483,6 +494,16 @@
                 if (this.editable !== 'never') {
                     this.$('.u-field-value select').prop('disabled', disable);
                 }
+            },
+
+            createGroupOptions: function () {
+                return !(_.isUndefined(this.options.groupOptions)) ?  this.options.groupOptions :
+                [
+                    {
+                        'groupTitle': null,
+                        'selectOptions': this.options.options
+                    }
+                ];
             }
         });
 

@@ -1,4 +1,4 @@
-<li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
+<li data-id="<%- id %>" class="forum-nav-thread<% if (neverRead) { %> never-read<% } %>">
   <a href="#" class="forum-nav-thread-link">
     <div class="forum-nav-thread-wrapper-0">
       <%
@@ -72,7 +72,18 @@
       %>
       </span>
 
-      <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
+      <% if (!neverRead && unread_comments_count > 0) { %>
+        <span class="forum-nav-thread-unread-comments-count">
+          <%-
+            StringUtils.interpolate(
+              gettext('{unread_comments_count} new'),
+              {unread_comments_count: unread_comments_count}
+            )
+          %>
+        </span>
+      <% } %>
+
+      <span class="forum-nav-thread-comments-count">
       <%
       var fmt;
       // Counts in data do not include the post itself, but the UI should

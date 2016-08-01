@@ -126,7 +126,6 @@
                 this.collection.on('thread:remove', this.threadRemoved);
                 this.sidebar_padding = 10;
                 this.boardName = null;
-                this.template = _.template($('#thread-list-template').html());
                 this.current_search = '';
                 this.mode = 'all';
                 this.searchAlertCollection = new Backbone.Collection([], {
@@ -148,9 +147,12 @@
                 this.searchAlertCollection.on('remove', function(searchAlert) {
                     return self.$('#search-alert-' + searchAlert.cid).remove();
                 });
-                return this.searchAlertCollection.on('reset', function() {
+                this.searchAlertCollection.on('reset', function() {
                     return self.$('.search-alerts').empty();
                 });
+                this.template = edx.HtmlUtils.template($('#thread-list-template').html());
+                this.homeTemplate = edx.HtmlUtils.template($('#discussion-home-template').html());
+                this.threadListItemTemplate = edx.HtmlUtils.template($('#thread-list-item-template').html());
             };
 
             /**
@@ -243,14 +245,16 @@
             };
 
             DiscussionThreadListView.prototype.render = function() {
-                var self = this,
-                    $elem = this.template({
-                        isCohorted: this.courseSettings.get('is_cohorted'),
-                        isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
-                    });
+                var self = this;
                 this.timer = 0;
                 this.$el.empty();
-                this.$el.append($elem);
+                edx.HtmlUtils.append(
+                    this.$el,
+                    this.template({
+                        isCohorted: this.courseSettings.get('is_cohorted'),
+                        isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
+                    })
+                );
                 this.$('.forum-nav-sort-control option').removeProp('selected');
                 this.$('.forum-nav-sort-control option[value=' + this.collection.sort_preference + ']')
                     .prop('selected', true);
@@ -372,20 +376,15 @@
             };
 
             DiscussionThreadListView.prototype.renderThread = function(thread) {
-                var content, unreadCount;
-                content = $(_.template($('#thread-list-item-template').html())(thread.toJSON()));
-                unreadCount = thread.get('unread_comments_count') + (thread.get('read') ? 0 : 1);
-                if (unreadCount > 0) {
-                    content.find('.forum-nav-thread-comments-count').attr(
-                        'data-tooltip',
-                        edx.StringUtils.interpolate(
-                            ngettext('{unread_count} new comment', '{unread_count} new comments', unreadCount),
-                            {unread_count: unreadCount},
-                            true
-                        )
+                var hasComments = thread.get('unread_comments_count') > 0,
+                    neverRead = !thread.get('read') && !hasComments,
+                    context = _.extend(
+                        {
+                            neverRead: neverRead
+                        },
+                        thread.toJSON()
                     );
-                }
-                return content;
+                return $(this.threadListItemTemplate(context).toString());
             };
 
             DiscussionThreadListView.prototype.threadSelected = function(e) {
@@ -417,11 +416,9 @@
 
             DiscussionThreadListView.prototype.goHome = function() {
                 var url, $templateContent;
-                this.template = _.template($('#discussion-home-template').html());
-                $templateContent = $(this.template());
+                $templateContent = $(this.homeTemplate().toString());
                 $('.forum-content').empty().append($templateContent);
-                $('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
-                    .remove();
+                $('.forum-nav-thread-list a').removeClass('is-active').find('.sr').remove();
                 $('input.email-setting').bind('click', this.updateEmailNotifications);
                 url = DiscussionUtil.urlFor('notifications_status', window.user.get('id'));
                 DiscussionUtil.safeAjax({
@@ -534,10 +531,10 @@
                 $test = $('<div>');
                 $test.css({
                     'font-size': this.$('.forum-nav-browse-current').css('font-size'),
-                    opacity: 0,
-                    position: 'absolute',
-                    left: -1000,
-                    top: -1000
+                    'opacity': 0,
+                    'position': 'absolute',
+                    'left': -1000,
+                    'top': -1000
                 });
                 $('body').append($test);
                 $test.text(name);
@@ -638,7 +635,7 @@
                         Content.loadContentInfos(response.annotated_content_info);
                         self.displayedCollection.reset(self.collection.models);
                         if (callback) {
-                            return callback();
+                            callback();
                         }
                     }
                 });
@@ -693,7 +690,7 @@
                  calling discussion.loadMorePages
                  Mainly because this currently does not reset any pagination variables which could cause problems.
                  This doesn't use pagination either.
-                */
+                 */
 
                 return DiscussionUtil.safeAjax({
                     $elem: this.$('.forum-nav-search-input'),

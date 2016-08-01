@@ -113,8 +113,10 @@
 }
 
 @mixin forum-post-label($color) {
+  @include margin-right(2px);
   @extend %t-weight4;
   font-size: $forum-small-font-size;
+  font-weight: bold;
   display: inline;
   margin-top: ($baseline/4);
   border: 1px solid;

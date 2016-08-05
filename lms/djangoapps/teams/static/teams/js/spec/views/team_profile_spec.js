@@ -5,7 +5,7 @@ define([
     'teams/js/spec_helpers/team_spec_helpers',
     'teams/js/models/team',
     'teams/js/views/team_profile'
-], function (_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
     describe('TeamProfileView', function () {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,

@@ -4,7 +4,7 @@ define([
     'common/js/spec_helpers/discussion_spec_helper',
     'teams/js/spec_helpers/team_spec_helpers',
     'teams/js/views/team_discussion'
-], function (_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
     'use strict';
     xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;

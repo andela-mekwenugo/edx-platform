@@ -480,12 +480,19 @@
             };
 
             DiscussionThreadListView.prototype.getBreadcrumbText = function($item) {
-                var subTopic = $('.forum-nav-browse-title', $item).first().text().trim(),
-                    $parentSubMenus = $item.parents('.forum-nav-browse-submenu'),
-                    crumbs = [];
+                var $parentSubMenus = $item.parents('.forum-nav-browse-submenu'),
+                    crumbs = [],
+                    subTopic = $('.forum-nav-browse-title', $item)
+                        .first()
+                        .text()
+                        .trim();
 
                 $parentSubMenus.each(function(i, el) {
-                    crumbs.push($(el).siblings('.forum-nav-browse-title').first().text().trim());
+                    crumbs.push($(el).siblings('.forum-nav-browse-title')
+                        .first()
+                        .text()
+                        .trim()
+                    );
                 });
 
                 if (subTopic !== 'All Discussions') {
@@ -590,22 +597,22 @@
                 $item = $target.closest('.forum-nav-browse-menu-item');
 
                 this.setCurrentTopicDisplay(this.getPathText($item));
-                this.trigger("topic:selected", this.getBreadcrumbText($item));
+                this.trigger('topic:selected', this.getBreadcrumbText($item));
 
-                if ($item.hasClass("forum-nav-browse-menu-all")) {
+                if ($item.hasClass('forum-nav-browse-menu-all')) {
                     this.discussionIds = "";
                     this.$('.forum-nav-filter-cohort').show();
                     return this.retrieveAllThreads();
-                } else if ($item.hasClass("forum-nav-browse-menu-following")) {
+                } else if ($item.hasClass('forum-nav-browse-menu-following')) {
                     this.retrieveFollowed();
                     return this.$('.forum-nav-filter-cohort').hide();
                 } else {
-                    allItems = $item.find(".forum-nav-browse-menu-item").andSelf();
+                    allItems = $item.find('.forum-nav-browse-menu-item').andSelf();
                     discussionIds = allItems.filter("[data-discussion-id]").map(function(i, elem) {
                         return $(elem).data("discussion-id");
                     }).get();
                     this.retrieveDiscussions(discussionIds);
-                    return this.$(".forum-nav-filter-cohort").toggle($item.data('cohorted') === true);
+                    return this.$('.forum-nav-filter-cohort').toggle($item.data('cohorted') === true);
                 }
             };
 

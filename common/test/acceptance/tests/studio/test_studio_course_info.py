@@ -2,15 +2,14 @@
 Acceptance Tests for Course Information
 """
 import uuid
-from base_studio_test import StudioCourseTest
-from common.test.acceptance.pages.studio.login import LoginPage
+
+from bok_choy.web_app_test import WebAppTest
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
-from common.test.acceptance.fixtures.course import CourseFixture
+from flaky import flaky
+
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.overview import CourseOutlinePage
-from bok_choy.web_app_test import WebAppTest
-from flaky import flaky
 
 
 def _create_course(self):
@@ -91,12 +90,11 @@ class UsersCanAddUpdatesTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
         self.assertTrue(self.course_updates_page.is_new_update_form_present())
-        self.course_updates_page.add_update('Hello')
+        self.course_updates_page.submit_update('Hello')
 
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
 
 
-@flaky(25, 25)
 class UsersCanAddEditTest(WebAppTest):
     """
     Scenario: Users can edit updates
@@ -132,11 +130,11 @@ class UsersCanAddEditTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
         self.assertTrue(self.course_updates_page.is_new_update_form_present())
-        self.course_updates_page.add_update('Hello')
+        self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.assertTrue(self.course_updates_page.is_edit_button_present())
         self.course_updates_page.click_edit_update_button()
-        self.course_updates_page.add_update('Goodbye')
+        self.course_updates_page.submit_update('Goodbye')
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
         self.assertTrue(self.course_updates_page.update_text_contains('Goodbye'))
 
@@ -178,10 +176,138 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
         self.assertTrue(self.course_updates_page.is_new_update_form_present())
-        self.course_updates_page.add_update('Hello')
+        self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.course_updates_page.click_delete_update_button()
         self.course_updates_page.click_confirm_delete_action()
         self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
+
+class UsersCanEditUpdateDatesTest(WebAppTest):
+    """
+    Scenario: Users can edit update dates
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        And I add a new update with the text "Hello"
+        When I edit the date to "06/01/13"
+        Then I should see the date "June 1, 2013"
+        And I see a "saving" notification
+    """
+
+    def setUp(self):
+        super(UsersCanEditUpdateDatesTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+        self.dashboard_page = DashboardPage(self.browser)
+
+        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_org = "orgX"
+        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_run = "2016_T2"
+
+        # Create a course
+        _create_course(self=self)
+        self.course_updates_page = CourseUpdatesPage(
+            self.browser,
+            self.course_org,
+            self.course_number,
+            self.course_run
+        )
+
+    def test_delete_course_update(self):
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.is_new_update_button_present())
+        self.course_updates_page.click_new_update_button()
+        self.assertTrue(self.course_updates_page.is_new_update_form_present())
+        self.course_updates_page.submit_update('Hello')
+        self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
+        self.course_updates_page.click_edit_update_button()
+        self.course_updates_page.set_date('06/01/2013')
+        self.course_updates_page.click_new_update_save_button()
+        self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
+        self.assertTrue(self.course_updates_page.is_update_date('June 1, 2013'))
+
+
+class TextOutsideTagsPreservedTest(WebAppTest):
+    """
+    Scenario: Text outside of tags is preserved
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I add a new update with the text "before <strong>middle</strong> after"
+        Then I should see the update "before <strong>middle</strong> after"
+        And when I reload the page
+        Then I should see the update "before <strong>middle</strong> after"
+    """
+
+    def setUp(self):
+        super(TextOutsideTagsPreservedTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+        self.dashboard_page = DashboardPage(self.browser)
+
+        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_org = "orgX"
+        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_run = "2016_T2"
+
+        # Create a course
+        _create_course(self=self)
+        self.course_updates_page = CourseUpdatesPage(
+            self.browser,
+            self.course_org,
+            self.course_number,
+            self.course_run
+        )
+
+    def test_delete_course_update(self):
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.is_new_update_button_present())
+        self.course_updates_page.click_new_update_button()
+        self.assertTrue(self.course_updates_page.is_new_update_form_present())
+        self.course_updates_page.submit_update('before <strong>middle</strong> after')
+        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
+
+
+class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
+    """
+    Scenario: Static links are rewritten when previewing a course update
+       Given I have opened a new course in Studio
+       And I go to the course updates page
+       When I add a new update with the text "<img src='/static/my_img.jpg'/>"
+       # Can only do partial text matches because of the quotes with in quotes (and regexp step matching).
+       Then I should see the asset update to "my_img.jpg"
+       And I change the update from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
+       Then I should see the asset update to "modified.jpg"
+       And when I reload the page
+       Then I should see the asset update to "modified.jpg"
+    """
+
+    def setUp(self):
+        super(StaticLinksRewrittenWhenPreviewingCourseUpdateTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+        self.dashboard_page = DashboardPage(self.browser)
+
+        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_org = "orgX"
+        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_run = "2016_T2"
+
+        # Create a course
+        _create_course(self=self)
+        self.course_updates_page = CourseUpdatesPage(
+            self.browser,
+            self.course_org,
+            self.course_number,
+            self.course_run
+        )
+
+    def test_delete_course_update(self):
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.is_new_update_button_present())
+        self.course_updates_page.click_new_update_button()
+        self.assertTrue(self.course_updates_page.is_new_update_form_present())
+        self.course_updates_page.submit_update("<img src='/static/my_img.jpg'/>")
+        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))

@@ -1,10 +1,8 @@
 """
 Course Updates page.
 """
-from common.test.acceptance.pages.studio.utils import type_in_codemirror
-from common.test.acceptance.pages.studio.utils import press_the_notification_button
-
 from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import type_in_codemirror, set_input_value
 
 
 class CourseUpdatesPage(CoursePage):
@@ -19,9 +17,6 @@ class CourseUpdatesPage(CoursePage):
     def are_course_updates_on_page(self):
         return self.q(css='article#course-update-view.course-updates').present
 
-    def are_course_update_entries_present(self):
-        return self.q(css='div.post-preview').present
-
     def is_new_update_button_present(self):
         return self.q(css='.new-update-button').present
 
@@ -35,10 +30,20 @@ class CourseUpdatesPage(CoursePage):
     def is_new_update_form_present(self):
         return self.q(css='.CodeMirror').present
 
-    def add_update(self, message):
+    def submit_update(self, message):
         type_in_codemirror(self, 0, message)
         if self.is_new_update_save_button_present():
             self.click_new_update_save_button()
+
+    def set_date(self, date):
+        set_input_value(self, 'input.date', date)
+
+    def is_update_date(self, search_date):
+        dates = self.q(css='.date-display').html
+        for date in dates:
+            if search_date == date:
+                return True
+        return False
 
     def is_new_update_save_button_present(self):
         return self.q(css='.save-button').present
@@ -67,13 +72,14 @@ class CourseUpdatesPage(CoursePage):
             self.wait_for_page()
 
     def is_saving_deleting_notification_present(self):
+        self.wait_for_ajax()
+        self.wait_for_element_absence('.wrapper-notification-mini .is_hiding',
+                                      'Waiting for .wrapper-notification-mini to go away')
         return self.q(css='.wrapper-notification-mini').present
 
     def update_text_contains(self, message):
-        message_found = False
         updates = self.q(css='div.update-contents').html
         for update in updates:
-            print update
             if update == message:
-                message_found = True
-        return message_found
+                return True
+        return False

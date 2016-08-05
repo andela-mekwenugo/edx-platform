@@ -21,10 +21,13 @@ class CourseUpdatesPage(CoursePage):
         return self.q(css='.new-update-button').present
 
     def click_new_update_button(self):
-        # Wait for the handouts-content, otherwise the render of the page will clear the new update
-        # form when loading content
+        """
+        Wait for the handouts-content, otherwise the render of the page will clear the new update
+        form when loading content
+        """
         self.wait_for_element_presence('.handouts-content', '.handouts-content')
         self.q(css='.new-update-button').click()
+        self.wait_for_page()
         self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
 
     def is_new_update_form_present(self):
@@ -34,6 +37,7 @@ class CourseUpdatesPage(CoursePage):
         type_in_codemirror(self, 0, message)
         if self.is_new_update_save_button_present():
             self.click_new_update_save_button()
+            self.wait_for_page()
 
     def set_date(self, date):
         set_input_value(self, 'input.date', date)
@@ -64,7 +68,11 @@ class CourseUpdatesPage(CoursePage):
 
     def click_confirm_delete_action(self):
         self.q(css='button.action-primary').first.click()
-        self.wait_for_element_presence('.handouts-content', '.handouts-content')
+        self.wait_for_ajax()
+        self.wait_for_page()
+        # self.wait_for_element_presence('.handouts-content', '.handouts-content')
+        self.wait_for_element_absence('div.post-preview .update-contents',
+                                      'Waiting for the update-content to be cleared')
 
     def click_delete_update_button(self):
         if self.is_delete_update_button_present():
@@ -72,14 +80,18 @@ class CourseUpdatesPage(CoursePage):
             self.wait_for_page()
 
     def is_saving_deleting_notification_present(self):
-        self.wait_for_ajax()
-        self.wait_for_element_absence('.wrapper-notification-mini .is_hiding',
-                                      'Waiting for .wrapper-notification-mini to go away')
-        return self.q(css='.wrapper-notification-mini').present
+        return self.q(css='#notification-mini').present
 
     def update_text_contains(self, message):
         updates = self.q(css='div.update-contents').html
         for update in updates:
             if update == message:
+                return True
+        return False
+
+    def update_contains_html(self, value):
+        updates = self.q(css='div.update-contents').html
+        for update in updates:
+            if value in update:
                 return True
         return False

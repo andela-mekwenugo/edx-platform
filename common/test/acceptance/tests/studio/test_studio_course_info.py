@@ -13,6 +13,9 @@ from ...pages.studio.overview import CourseOutlinePage
 
 
 def _create_course(self):
+    """
+    Helper method to create a course within the setup method
+    """
     self.auth_page.visit()
     self.dashboard_page.visit()
     self.dashboard_page.wait_for_page()
@@ -91,7 +94,6 @@ class UsersCanAddUpdatesTest(WebAppTest):
         self.course_updates_page.click_new_update_button()
         self.assertTrue(self.course_updates_page.is_new_update_form_present())
         self.course_updates_page.submit_update('Hello')
-
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
 
 
@@ -103,7 +105,6 @@ class UsersCanAddEditTest(WebAppTest):
         When I add a new update with the text "Hello"
         And I modify the text to "Goodbye"
         Then I should see the update "Goodbye"
-        And I see a "saving" notification
     """
 
     def setUp(self):
@@ -139,7 +140,7 @@ class UsersCanAddEditTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('Goodbye'))
 
 
-@flaky(25, 25)
+@flaky(15, 15)
 class UsersCanDeleteUpdateTest(WebAppTest):
     """
     Scenario: Users can delete updates
@@ -149,7 +150,6 @@ class UsersCanDeleteUpdateTest(WebAppTest):
           And I delete the update
           And I confirm the prompt
           Then I should not see the update "Hello"
-          And I see a "deleting" notification
     """
 
     def setUp(self):
@@ -180,10 +180,9 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.course_updates_page.click_delete_update_button()
         self.course_updates_page.click_confirm_delete_action()
-        self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
-
+@flaky(25, 25)
 class UsersCanEditUpdateDatesTest(WebAppTest):
     """
     Scenario: Users can edit update dates
@@ -192,7 +191,6 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         And I add a new update with the text "Hello"
         When I edit the date to "06/01/13"
         Then I should see the date "June 1, 2013"
-        And I see a "saving" notification
     """
 
     def setUp(self):
@@ -214,7 +212,7 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
             self.course_run
         )
 
-    def test_delete_course_update(self):
+    def test_user_edit_update(self):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
@@ -227,7 +225,7 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
         self.assertTrue(self.course_updates_page.is_update_date('June 1, 2013'))
 
-
+@flaky(25, 25)
 class TextOutsideTagsPreservedTest(WebAppTest):
     """
     Scenario: Text outside of tags is preserved
@@ -258,7 +256,7 @@ class TextOutsideTagsPreservedTest(WebAppTest):
             self.course_run
         )
 
-    def test_delete_course_update(self):
+    def test_outside_tag_preserved(self):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
@@ -268,7 +266,7 @@ class TextOutsideTagsPreservedTest(WebAppTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
 
-
+@flaky(25, 25)
 class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
     """
     Scenario: Static links are rewritten when previewing a course update
@@ -302,12 +300,17 @@ class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
             self.course_run
         )
 
-    def test_delete_course_update(self):
+    def test_asset_change_in_updates(self):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
         self.assertTrue(self.course_updates_page.is_new_update_form_present())
         self.course_updates_page.submit_update("<img src='/static/my_img.jpg'/>")
-        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
+        self.assertTrue(self.course_updates_page.update_contains_html("my_img.jpg"))
+        self.course_updates_page.click_edit_update_button()
+        self.assertTrue(self.course_updates_page.is_new_update_form_present())
+        self.course_updates_page.submit_update("<img src='/static/modified.jpg'/>")
+        self.assertFalse(self.course_updates_page.update_contains_html("my_img.jpg"))
+        self.assertTrue(self.course_updates_page.update_contains_html("modified.jpg"))
         self.course_updates_page.visit()
-        self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
+        self.assertTrue(self.course_updates_page.update_contains_html("modified.jpg"))

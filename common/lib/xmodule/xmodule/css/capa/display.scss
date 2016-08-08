@@ -28,6 +28,7 @@ $partiallycorrect: $green-d2;
 $incorrect: $red;
 
 @import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
+@import '../../../../../static/sass/edx-pattern-library-shims/tooltips';
 
 // +Extends - Capa
 // ====================
@@ -1115,6 +1116,24 @@ div.problem {
     &:first-child {
       margin-bottom: $baseline / 4;
     }
+  }
+
+  .show {
+    position: relative;
+    z-index: 2;
+  }
+
+  .show-answer-tooltip {
+    @extend %light-color-tooltip;
+      @media (max-width: $bp-screen-md) {
+        margin-top: $baseline;
+        @include left(0);
+        @include right(auto);
+        top: inherit;
+        &:after {
+          @include left(flex-grid(2,10));
+        }
+     }
   }
 
   div.capa_reset {

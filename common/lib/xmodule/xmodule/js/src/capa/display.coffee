@@ -45,6 +45,9 @@ class @Problem
     @saveButton = @$('div.action button.save')
     @saveButton.click @save
 
+    @showButton.on('focus mouseenter', @displayShowAnswerTooltip)
+    @showButton.on('blur mouseleave', @hideShowAnswerTooltip)
+
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
       icon = $(ev.target).children "i"
@@ -402,24 +405,13 @@ class @Problem
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
         `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-        @$('.show-label').text gettext('Hide Answer')
+
         @el.addClass 'showed'
+        $('html, body').animate({
+          scrollTop: @questionTitle.offset().top
+        }, 500);
         @updateProgress response
         window.SR.readElts(answer_text)
-    else
-      @$('[id^=answer_], [id^=solution_]').text ''
-      @$('[correct_answer]').attr correct_answer: null
-      @el.removeClass 'showed'
-      `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-      @$('.show-label').text gettext('Show Answer')
-      window.SR.readText(gettext('Answer hidden'))
-
-      @el.find(".capa_inputtype").each (index, inputtype) =>
-        display = @inputtypeDisplays[$(inputtype).attr('id')]
-        classes = $(inputtype).attr('class').split(' ')
-        for cls in classes
-          hideMethod = @inputtypeHideAnswerMethods[cls]
-          hideMethod(inputtype, display) if hideMethod?
 
   gentle_alert: (msg) =>
     if @el.find('.capa_alert').length
@@ -428,6 +420,12 @@ class @Problem
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
     window.SR.readElts @el.find('.capa_alert')
+
+  displayShowAnswerTooltip: =>
+    @el.find('.show-answer-tooltip').removeClass('sr')
+
+  hideShowAnswerTooltip: =>
+    @el.find('.show-answer-tooltip').addClass('sr')
 
   save: =>
     if not @check_save_waitfor(@save_internal)

@@ -1,0 +1,41 @@
+// ------------------------------
+// LMS Problem Feedback Revamp styling
+// Mirror styles from the Pattern Library
+
+// NOTE: This is the left-to-right (LTR) configured style compile.
+// It should mirror lms-problem-feedback-rtl w/ the exception of bi-app references.
+
+@import 'base/variables';
+
+
+// TOOLTIPS STYLES
+
+// ------------------------------
+// light color tooltip
+// ------------------------------
+%light-color-tooltip {
+  margin-top: $baseline / 5;
+  padding: $baseline / 2;
+  position: absolute;
+  top: 55px;
+  @include right(0);
+  background: $gray-l5;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px $gray-l3;
+  color: $black;
+  text-align: left;
+  text-transform: none;
+  white-space: pre;
+  pointer-events: none;
+  &:after {
+    content: " ";
+    display: block;
+    width: $baseline / 2;
+    height: $baseline / 2;
+    position: absolute;
+    top: -5px;
+    @include right(18px);
+    background: $gray-l5;
+    transform: rotate(45deg);
+  }
+}

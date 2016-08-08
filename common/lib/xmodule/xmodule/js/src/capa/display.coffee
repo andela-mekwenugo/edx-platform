@@ -98,7 +98,7 @@ class @Problem
         progress = interpolate(progress_template, {'num_points': possible}, true)
 
     graded = if (graded == "True" and possible != 0) then "graded" else "practice problem"
-    progress = progress + interpolate(" (%(graded)s)", {"graded": graded}, true)
+    progress = progress + interpolate("; %(graded)s", {"graded": graded}, true)
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>

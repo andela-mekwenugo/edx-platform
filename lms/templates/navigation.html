@@ -98,6 +98,14 @@ site_status_msg = get_site_status_msg(course_id)
         </%block>
       </ol>
 
+      <ol>
+        <li>
+          <a href="${get_online_help_info(online_help_token)['doc_url']}" 
+             title="${_("Contextual Online Help")}" 
+             target="_blank">${_("Help")}</a>
+        </li>
+      </ol>
+
       <%include file="user_dropdown.html"/>
 
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor

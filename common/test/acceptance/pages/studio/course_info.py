@@ -40,12 +40,6 @@ class CourseUpdatesPage(CoursePage):
         """
         click_css(self, '.new-update-button', require_notification=False)
 
-    def is_new_update_form_present(self):
-        """
-        Has the new update form loaded and it is present
-        """
-        return self.q(css='.CodeMirror').present
-
     def submit_update(self, message):
         """
         Adds update text to the new update CodeMirror form and submits that text

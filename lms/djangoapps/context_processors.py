@@ -10,8 +10,9 @@ from util.help_context_processor import common_doc_url
 # Open and parse the configuration file when the module is initialized
 CONFIG_FILE = open(settings.REPO_ROOT / "docs" / "lms_config.ini")
 EDX_PARTNER_CONFIG_OVERRIDES_FILE = open(settings.REPO_ROOT / "docs" / "lms_edx_partner_config.ini")
+CONFIG_FILES = [CONFIG_FILE, EDX_PARTNER_CONFIG_OVERRIDES_FILE]
 CONFIG = ConfigParser.ConfigParser()
-CONFIG.read([CONFIG_FILE, EDX_PARTNER_CONFIG_OVERRIDES_FILE])
+CONFIG.read(CONFIG_FILES)
 
 def doc_url(request=None):  # pylint: disable=unused-argument
     """

@@ -1,6 +1,7 @@
 """
 Course Updates page.
 """
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import type_in_codemirror, set_input_value
 
@@ -14,6 +15,9 @@ class CourseUpdatesPage(CoursePage):
     def is_browser_on_page(self):
         """
         Returns whether or not the browser on the page and has loaded the required content
+
+        Check for the presence of handouts-content, when it is present the render function has completed
+        loading the updates and handout sections
         """
         return self.q(css='.handouts-content').present
 
@@ -34,10 +38,7 @@ class CourseUpdatesPage(CoursePage):
         Wait for the handouts-content, otherwise the render of the page will clear the new update
         form when loading content
         """
-        self.wait_for_element_presence('.handouts-content', '.handouts-content')
-        self.q(css='.new-update-button').click()
-        self.wait_for_page()
-        self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
+        click_css(self, '.new-update-button', require_notification=False)
 
     def is_new_update_form_present(self):
         """
@@ -53,9 +54,7 @@ class CourseUpdatesPage(CoursePage):
             message (str): The message to be added and saved
         """
         type_in_codemirror(self, 0, message)
-        if self.is_new_update_save_button_present():
-            self.click_new_update_save_button()
-            self.wait_for_page()
+        self.click_new_update_save_button()
 
     def set_date(self, date):
         """
@@ -89,8 +88,7 @@ class CourseUpdatesPage(CoursePage):
         """
         Clicks the CodeMirror Update save button
         """
-        self.q(css='.save-button').first.click()
-        self.wait_for_page()
+        click_css(self, '.save-button')
 
     def is_edit_button_present(self):
         """
@@ -102,8 +100,9 @@ class CourseUpdatesPage(CoursePage):
         """
         Clicks the edit update post button
         """
-        self.q(css='div.post-preview .edit-button').first.click()
-        self.wait_for_page()
+        # self.q(css='div.post-preview .edit-button').first.click()
+        click_css(self, 'div.post-preview .edit-button', require_notification=False)
+        self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
 
     def is_delete_update_button_present(self):
         """
@@ -111,24 +110,12 @@ class CourseUpdatesPage(CoursePage):
         """
         return self.q(css='div.post-preview .delete-button').present
 
-    def click_confirm_delete_action(self):
-        """
-        Clicks the confirmation action when deleting a post
-        """
-        self.wait_for_element_visibility('button.action-primary', 'Waiting for the delete confirmation to be present')
-        self.q(css='button.action-primary').first.click()
-        self.wait_for_page()
-        self.wait_for_ajax()
-        # self.wait_for_element_absence('div.post-preview .update-contents',
-        #                               'Waiting for the update-content to be cleared')
-
     def click_delete_update_button(self):
         """
         Clicks the delete update post button
         """
-        self.wait_for_element_visibility('div.post-preview .delete-button', "Waiting for the delete buttons visibility")
-        self.q(css='div.post-preview .delete-button').first.click()
-        self.wait_for_page()
+        click_css(self, 'div.post-preview .delete-button', require_notification=False)
+        confirm_prompt(self)
 
     def is_saving_deleting_notification_present(self):
         """
@@ -146,9 +133,9 @@ class CourseUpdatesPage(CoursePage):
         Returns:
             bool: True if an instance of the message is found
         """
-        updates = self.q(css='div.update-contents').html
-        for update in updates:
-            if update == message:
+        update = self.q(css='div.update-contents').html
+        if len(update) > 0:
+            if update[0] == message:
                 return True
         return False
 
@@ -162,8 +149,8 @@ class CourseUpdatesPage(CoursePage):
         Returns:
             bool: True if the value is contained in any of the update posts
         """
-        updates = self.q(css='div.update-contents').html
-        for update in updates:
-            if value in update:
+        update = self.q(css='div.update-contents').html
+        if len(update) > 0:
+            if value in update[0]:
                 return True
         return False

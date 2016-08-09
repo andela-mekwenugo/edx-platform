@@ -181,7 +181,7 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.course_updates_page.click_delete_update_button()
-        self.course_updates_page.click_confirm_delete_action()
+        # self.course_updates_page.click_confirm_delete_action()
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
 
@@ -224,7 +224,6 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         self.course_updates_page.click_edit_update_button()
         self.course_updates_page.set_date('06/01/2013')
         self.course_updates_page.click_new_update_save_button()
-        self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
         self.assertTrue(self.course_updates_page.is_update_date('June 1, 2013'))
 
 
@@ -306,11 +305,9 @@ class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-        self.assertTrue(self.course_updates_page.is_new_update_form_present())
         self.course_updates_page.submit_update("<img src='/static/my_img.jpg'/>")
         self.assertTrue(self.course_updates_page.update_contains_html("my_img.jpg"))
         self.course_updates_page.click_edit_update_button()
-        self.assertTrue(self.course_updates_page.is_new_update_form_present())
         self.course_updates_page.submit_update("<img src='/static/modified.jpg'/>")
         self.assertFalse(self.course_updates_page.update_contains_html("my_img.jpg"))
         self.assertTrue(self.course_updates_page.update_contains_html("modified.jpg"))

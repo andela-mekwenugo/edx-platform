@@ -111,7 +111,7 @@ describe 'Problem', ->
         testProgessData(@problem, 'none', '0/1', "False", "1 point possible; ungraded")
 
       it 'displays ungraded if number of points possible is 0', ->
-        testProgessData(@problem, 'none', 'none', '0', "False", "0 points possible; ungraded")
+        testProgessData(@problem, 'none', '0', "False", "0 points possible; ungraded")
 
       it 'displays ungraded if number of points possible is 0, even if graded value is True', ->
         testProgessData(@problem, 'none', '0', "True", "0 points possible; ungraded")
@@ -125,12 +125,12 @@ describe 'Problem', ->
         testProgessData(@problem, 'test status', '2/2', "True", "2/2 points earned; graded")
 
       it 'reports the current score even if problem is ungraded', ->
-        testProgessData(@problem, 'test status', '1/1', "False", "1/1 points earned; ungraded")
+        testProgessData(@problem, 'test status', '1/1', "False", "1/1 point earned; ungraded")
 
     describe 'with valid status and string containing an integer like "0" for detail', ->
       # These tests are to address a failure specific to Chrome 51 and 52 +
-      it 'shows 0 points possible for the detail and ungraded', ->
-        testProgessData(@problem, 'foo', '0', "0 points possible; ungraded")
+      it 'shows 0 points possible for the detail', ->
+        testProgessData(@problem, 'foo', '0', "False", "")
 
   describe 'render', ->
     beforeEach ->

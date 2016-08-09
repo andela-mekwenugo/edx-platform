@@ -184,6 +184,7 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.course_updates_page.click_confirm_delete_action()
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
+
 class UsersCanEditUpdateDatesTest(WebAppTest):
     """
     Scenario: Users can edit update dates

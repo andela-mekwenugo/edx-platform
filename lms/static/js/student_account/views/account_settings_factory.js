@@ -120,7 +120,10 @@
                                     'time zone here, course dates, including assignment deadlines, are displayed in ' +
                                     'Coordinated Universal Time (UTC).'
                                 ),
-                                options: fieldsData.time_zone.options,
+                                groupOptions: [{
+                                    'groupTitle': gettext('All Time Zones'),
+                                    'selectOptions': fieldsData.time_zone.options
+                                }],
                                 persistChanges: true
                             })
                         }

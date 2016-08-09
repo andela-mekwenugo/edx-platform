@@ -82,15 +82,15 @@
 
                 initialize: function (options) {
                     this.options = _.extend({}, options);
-                    _.bindAll(this, 'updateList', 'listenToCountryView');
+                    _.bindAll(this, 'listenToCountryView', 'updateCountrySubheader', 'replaceOrAddGroupOption');
                     this._super(options);
                 },
 
                 listenToCountryView: function (view) {
-                    this.listenTo(view.model, 'change:country', this.updateList);
+                    this.listenTo(view.model, 'change:country', this.updateCountrySubheader);
                 },
 
-                updateList: function (user) {
+                updateCountrySubheader: function (user) {
                     var view = this;
                     $.ajax({
                         type: 'GET',
@@ -100,20 +100,42 @@
                             var countryTimeZones = $.map(data, function (timeZoneInfo) {
                                 return [[timeZoneInfo.time_zone, timeZoneInfo.description]];
                             });
-                            view.options.groupOptions = [
-                                {
-                                    'groupTitle': gettext("Country Time Zones"),
-                                    'selectOptions': countryTimeZones
-
-                                },
-                                {
-                                    'groupTitle': gettext("All Time Zones"),
-                                    'selectOptions': view.options.options
-                                }
-                            ];
+                            view.replaceOrAddGroupOption(
+                                view.options.groupOptions,
+                                'Country Time Zones',
+                                countryTimeZones
+                            );
                             view.render();
                         }
                     });
+                },
+
+                updateValueInField: function () {
+                    if (this.modelValue()) {
+                        var options = [[this.modelValue(), this.displayValue(this.modelValue())]];
+                        this.replaceOrAddGroupOption(
+                            this.options.groupOptions,
+                            'Currently Selected Time Zone',
+                            options
+                        );
+                    }
+                    this._super();
+                },
+
+                replaceOrAddGroupOption: function (groupOptions, title, options) {
+                    var groupOption = {
+                        'groupTitle': gettext(title),
+                        'selectOptions': options
+                    };
+
+                    var index = _.findIndex(groupOptions, function (group) {
+                        return group.groupTitle === gettext(title);
+                    });
+                    if (index >= 0) {
+                        groupOptions[index] = groupOption;
+                    } else {
+                        groupOptions.unshift(groupOption);
+                    }
                 }
 
             }),

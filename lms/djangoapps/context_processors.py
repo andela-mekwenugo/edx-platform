@@ -11,7 +11,7 @@ from util.help_context_processor import common_doc_url
 CONFIG_FILE = open(settings.REPO_ROOT / "docs" / "lms_config.ini")
 EDX_PARTNER_CONFIG_OVERRIDES_FILE = open(settings.REPO_ROOT / "docs" / "lms_edx_partner_config.ini")
 CONFIG = ConfigParser.ConfigParser()
-CONFIG.readfp(CONFIG_FILE, EDX_PARTNER_CONFIG_OVERRIDES_FILE)
+CONFIG.read(CONFIG_FILE, EDX_PARTNER_CONFIG_OVERRIDES_FILE)
 
 def doc_url(request=None):  # pylint: disable=unused-argument
     """

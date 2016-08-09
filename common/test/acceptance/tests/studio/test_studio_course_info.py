@@ -3,57 +3,15 @@ Acceptance Tests for Course Information
 """
 import uuid
 
-from bok_choy.web_app_test import WebAppTest
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from flaky import flaky
+from base_studio_test import StudioCourseTest
 
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
-from ...pages.studio.overview import CourseOutlinePage
 
 
-def _create_course(self):
-    """
-    Helper method to create a course within the setup method
-    """
-    self.auth_page.visit()
-    self.dashboard_page.visit()
-    self.dashboard_page.wait_for_page()
-    self.assertFalse(self.dashboard_page.has_course(
-        org=self.course_org,
-        number=self.course_number,
-        run=self.course_run
-    ))
-    self.assertTrue(self.dashboard_page.new_course_button.present)
-    self.dashboard_page.click_new_course_button()
-    self.assertTrue(self.dashboard_page.is_new_course_form_visible())
-    self.dashboard_page.fill_new_course_form(
-        self.course_name,
-        self.course_org,
-        self.course_number,
-        self.course_run
-    )
-    self.assertTrue(self.dashboard_page.is_new_course_form_valid())
-    self.dashboard_page.submit_new_course_form()
-
-    # Successful creation of course takes user to course outline page
-    course_outline_page = CourseOutlinePage(
-        self.browser,
-        self.course_org,
-        self.course_number,
-        self.course_run
-    )
-    course_outline_page.visit()
-    course_outline_page.wait_for_page()
-
-    # Go back to dashboard and verify newly created course exists there
-    self.dashboard_page.visit()
-    self.assertTrue(self.dashboard_page.has_course(
-        org=self.course_org, number=self.course_number, run=self.course_run
-    ))
-
-
-class UsersCanAddUpdatesTest(WebAppTest):
+class UsersCanAddUpdatesTest(StudioCourseTest):
     """
       Scenario: Users can add updates
           Given I have opened a new course in Studio
@@ -67,13 +25,11 @@ class UsersCanAddUpdatesTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,
@@ -97,7 +53,7 @@ class UsersCanAddUpdatesTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
 
 
-class UsersCanAddEditTest(WebAppTest):
+class UsersCanAddEditTest(StudioCourseTest):
     """
     Scenario: Users can edit updates
         Given I have opened a new course in Studio
@@ -107,18 +63,16 @@ class UsersCanAddEditTest(WebAppTest):
         Then I should see the update "Goodbye"
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanAddEditTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,
@@ -140,10 +94,8 @@ class UsersCanAddEditTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('Goodbye'))
 
 
-# On occasion this test will fail waiting for the update to be removed from the DOM
-# Working to remove this issue in TNL-5051
-@flaky(15, 15)
-class UsersCanDeleteUpdateTest(WebAppTest):
+@flaky(25, 25)
+class UsersCanDeleteUpdateTest(StudioCourseTest):
     """
     Scenario: Users can delete updates
           Given I have opened a new course in Studio
@@ -154,18 +106,16 @@ class UsersCanDeleteUpdateTest(WebAppTest):
           Then I should not see the update "Hello"
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanDeleteUpdateTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,
@@ -185,7 +135,7 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
 
-class UsersCanEditUpdateDatesTest(WebAppTest):
+class UsersCanEditUpdateDatesTest(StudioCourseTest):
     """
     Scenario: Users can edit update dates
         Given I have opened a new course in Studio
@@ -195,18 +145,16 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         Then I should see the date "June 1, 2013"
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanEditUpdateDatesTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,
@@ -227,7 +175,7 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_update_date('June 1, 2013'))
 
 
-class TextOutsideTagsPreservedTest(WebAppTest):
+class TextOutsideTagsPreservedTest(StudioCourseTest):
     """
     Scenario: Text outside of tags is preserved
         Given I have opened a new course in Studio
@@ -238,18 +186,16 @@ class TextOutsideTagsPreservedTest(WebAppTest):
         Then I should see the update "before <strong>middle</strong> after"
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False, test_xss=True):
         super(TextOutsideTagsPreservedTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,
@@ -268,7 +214,7 @@ class TextOutsideTagsPreservedTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
 
 
-class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
+class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(StudioCourseTest):
     """
     Scenario: Static links are rewritten when previewing a course update
        Given I have opened a new course in Studio
@@ -282,18 +228,16 @@ class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
        Then I should see the asset update to "modified.jpg"
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False, test_xss=True):
         super(StaticLinksRewrittenWhenPreviewingCourseUpdateTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.course_name = "New Course Name" + str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2016_T2"
+        self.course_name = self.course_info['display_name']
+        self.course_org = self.course_info['org']
+        self.course_number = self.course_info['number']
+        self.course_run = self.course_info['run']
 
-        # Create a course
-        _create_course(self=self)
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
             self.course_org,

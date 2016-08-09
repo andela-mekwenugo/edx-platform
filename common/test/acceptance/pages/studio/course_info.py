@@ -115,19 +115,20 @@ class CourseUpdatesPage(CoursePage):
         """
         Clicks the confirmation action when deleting a post
         """
+        self.wait_for_element_visibility('button.action-primary', 'Waiting for the delete confirmation to be present')
         self.q(css='button.action-primary').first.click()
-        self.wait_for_ajax()
         self.wait_for_page()
-        self.wait_for_element_absence('div.post-preview .update-contents',
-                                      'Waiting for the update-content to be cleared')
+        self.wait_for_ajax()
+        # self.wait_for_element_absence('div.post-preview .update-contents',
+        #                               'Waiting for the update-content to be cleared')
 
     def click_delete_update_button(self):
         """
         Clicks the delete update post button
         """
-        if self.is_delete_update_button_present():
-            self.q(css='div.post-preview .delete-button').first.click()
-            self.wait_for_page()
+        self.wait_for_element_visibility('div.post-preview .delete-button', "Waiting for the delete buttons visibility")
+        self.q(css='div.post-preview .delete-button').first.click()
+        self.wait_for_page()
 
     def is_saving_deleting_notification_present(self):
         """

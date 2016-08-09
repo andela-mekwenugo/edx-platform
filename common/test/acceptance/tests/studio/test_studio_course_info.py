@@ -140,6 +140,8 @@ class UsersCanAddEditTest(WebAppTest):
         self.assertTrue(self.course_updates_page.update_text_contains('Goodbye'))
 
 
+# On occasion this test will fail waiting for the update to be removed from the DOM
+# Working to remove this issue in TNL-5051
 @flaky(15, 15)
 class UsersCanDeleteUpdateTest(WebAppTest):
     """
@@ -182,7 +184,6 @@ class UsersCanDeleteUpdateTest(WebAppTest):
         self.course_updates_page.click_confirm_delete_action()
         self.assertFalse(self.course_updates_page.update_text_contains('Hello'))
 
-@flaky(25, 25)
 class UsersCanEditUpdateDatesTest(WebAppTest):
     """
     Scenario: Users can edit update dates
@@ -225,7 +226,7 @@ class UsersCanEditUpdateDatesTest(WebAppTest):
         self.assertTrue(self.course_updates_page.is_saving_deleting_notification_present())
         self.assertTrue(self.course_updates_page.is_update_date('June 1, 2013'))
 
-@flaky(25, 25)
+
 class TextOutsideTagsPreservedTest(WebAppTest):
     """
     Scenario: Text outside of tags is preserved
@@ -266,7 +267,7 @@ class TextOutsideTagsPreservedTest(WebAppTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
 
-@flaky(25, 25)
+
 class StaticLinksRewrittenWhenPreviewingCourseUpdateTest(WebAppTest):
     """
     Scenario: Static links are rewritten when previewing a course update

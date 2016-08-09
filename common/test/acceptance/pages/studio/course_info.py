@@ -70,7 +70,6 @@ class CourseUpdatesPage(CoursePage):
         self.q(css='button.action-primary').first.click()
         self.wait_for_ajax()
         self.wait_for_page()
-        # self.wait_for_element_presence('.handouts-content', '.handouts-content')
         self.wait_for_element_absence('div.post-preview .update-contents',
                                       'Waiting for the update-content to be cleared')
 

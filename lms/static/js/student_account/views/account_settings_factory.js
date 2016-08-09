@@ -20,7 +20,7 @@
         ) {
             var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
-                showLoadingError, orderNumber, getUserField;
+                showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField;
 
             accountSettingsElement = $('.wrapper-account-settings');
 
@@ -121,8 +121,8 @@
                                     'Coordinated Universal Time (UTC).'
                                 ),
                                 groupOptions: [{
-                                    'groupTitle': gettext('All Time Zones'),
-                                    'selectOptions': fieldsData.time_zone.options
+                                    groupTitle: gettext('All Time Zones'),
+                                    selectOptions: fieldsData.time_zone.options
                                 }],
                                 persistChanges: true
                             })
@@ -173,16 +173,16 @@
             ];
 
             // set TimeZoneField to listen to CountryField
-            getUserField = function (list, search) {
-                return _.find(list, function (field) {
+            getUserField = function(list, search) {
+                return _.find(list, function(field) {
                     return field.view.options.valueAttribute === search;
                 }).view;
             };
-            var userFields = _.find(aboutSectionsData, function (section) {
+            userFields = _.find(aboutSectionsData, function(section) {
                 return section.title === gettext('Basic Account Information');
             }).fields;
-            var timeZoneDropdownField = getUserField(userFields, 'time_zone');
-            var countryDropdownField = getUserField(userFields, 'country');
+            timeZoneDropdownField = getUserField(userFields, 'time_zone');
+            countryDropdownField = getUserField(userFields, 'country');
             timeZoneDropdownField.listenToCountryView(countryDropdownField);
 
             accountsSectionData = [

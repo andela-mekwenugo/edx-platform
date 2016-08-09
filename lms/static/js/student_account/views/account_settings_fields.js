@@ -80,28 +80,27 @@
             TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
 
-                initialize: function (options) {
+                initialize: function(options) {
                     this.options = _.extend({}, options);
                     _.bindAll(this, 'listenToCountryView', 'updateCountrySubheader', 'replaceOrAddGroupOption');
-                    this._super(options);
+                    this._super(options);  // eslint-disable-line no-underscore-dangle
                 },
 
-                listenToCountryView: function (view) {
+                listenToCountryView: function(view) {
                     this.listenTo(view.model, 'change:country', this.updateCountrySubheader);
                 },
 
-                updateCountrySubheader: function (user) {
+                updateCountrySubheader: function(user) {
                     var view = this;
                     $.ajax({
                         type: 'GET',
                         url: '/user_api/v1/preferences/time_zones/',
-                        data: {'country_code': user.attributes.country},
-                        success: function (data) {
-                            var countryTimeZones = $.map(data, function (timeZoneInfo) {
+                        data: {country_code: user.attributes.country},
+                        success: function(data) {
+                            var countryTimeZones = $.map(data, function(timeZoneInfo) {
                                 return [[timeZoneInfo.time_zone, timeZoneInfo.description]];
                             });
                             view.replaceOrAddGroupOption(
-                                view.options.groupOptions,
                                 'Country Time Zones',
                                 countryTimeZones
                             );
@@ -110,31 +109,31 @@
                     });
                 },
 
-                updateValueInField: function () {
+                updateValueInField: function() {
+                    var options;
                     if (this.modelValue()) {
-                        var options = [[this.modelValue(), this.displayValue(this.modelValue())]];
+                        options = [[this.modelValue(), this.displayValue(this.modelValue())]];
                         this.replaceOrAddGroupOption(
-                            this.options.groupOptions,
                             'Currently Selected Time Zone',
                             options
                         );
                     }
-                    this._super();
+                    this._super(); // eslint-disable-line no-underscore-dangle
                 },
 
-                replaceOrAddGroupOption: function (groupOptions, title, options) {
+                replaceOrAddGroupOption: function(title, options) {
                     var groupOption = {
-                        'groupTitle': gettext(title),
-                        'selectOptions': options
+                        groupTitle: gettext(title),
+                        selectOptions: options
                     };
 
-                    var index = _.findIndex(groupOptions, function (group) {
+                    var index = _.findIndex(this.options.groupOptions, function(group) {
                         return group.groupTitle === gettext(title);
                     });
                     if (index >= 0) {
-                        groupOptions[index] = groupOption;
+                        this.options.groupOptions[index] = groupOption;
                     } else {
-                        groupOptions.unshift(groupOption);
+                        this.options.groupOptions.unshift(groupOption);
                     }
                 }
 

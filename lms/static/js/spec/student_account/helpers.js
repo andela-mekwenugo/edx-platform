@@ -50,8 +50,8 @@ define(['underscore'], function(_) {
     ];
 
     var TIME_ZONE_RESPONSE = [{
-        'time_zone': 'America/Guyana',
-        'description': 'America/Guyana (ECT, UTC-0500)'
+        time_zone: 'America/Guyana',
+        description: 'America/Guyana (ECT, UTC-0500)'
     }];
 
     var IMAGE_MAX_BYTES = 1024 * 1024;

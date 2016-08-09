@@ -45,8 +45,7 @@ define(['backbone',
                 );
             });
 
-            it("update time zone dropdown after country dropdown changes", function () {
-                requests = AjaxHelpers.requests(this);
+            it('update time zone dropdown after country dropdown changes', function() {
                 var baseSelector = '.u-field-value > select';
                 var groupsSelector = baseSelector + '> optgroup';
                 var groupOptionsSelector = groupsSelector + '> option';
@@ -54,21 +53,25 @@ define(['backbone',
                 var timeZoneData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.TimeZoneFieldView, {
                     valueAttribute: 'time_zone',
                     groupOptions: [{
-                        'groupTitle': gettext('All Time Zones'),
-                        'selectOptions': FieldViewsSpecHelpers.SELECT_OPTIONS
+                        groupTitle: gettext('All Time Zones'),
+                        selectOptions: FieldViewsSpecHelpers.SELECT_OPTIONS
                     }],
                     persistChanges: true,
                     required: true
                 });
-
                 var countryData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                     valueAttribute: 'country',
-                    options: [['KY', "Cayman Islands"], ['CA', 'Canada'], ['GY', 'Guyana']],
+                    options: [['KY', 'Cayman Islands'], ['CA', 'Canada'], ['GY', 'Guyana']],
                     persistChanges: true
                 });
 
+                var countryChange = {country: 'GY'};
+                var timeZoneChange = {time_zone: 'Pacific/Kosrae'};
+
                 var timeZoneView = new AccountSettingsFieldViews.TimeZoneFieldView(timeZoneData).render();
                 var countryView = new AccountSettingsFieldViews.DropdownFieldView(countryData).render();
+
+                requests = AjaxHelpers.requests(this);
 
                 timeZoneView.listenToCountryView(countryView);
 
@@ -78,10 +81,9 @@ define(['backbone',
                 expect(timeZoneView.$(groupOptionsSelector)[0].value).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
                 // change country
-                var countryChange = {'country': 'GY'};
                 countryView.$(baseSelector).val(countryChange[countryData.valueAttribute]).change();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, countryChange);
-                AjaxHelpers.respondWithJson(requests, {"success": "true"});
+                AjaxHelpers.respondWithJson(requests, {success: 'true'});
 
                 AjaxHelpers.expectRequest(
                     requests,
@@ -89,8 +91,8 @@ define(['backbone',
                     '/user_api/v1/preferences/time_zones/?country_code=GY'
                 );
                 AjaxHelpers.respondWithJson(requests, [
-                    {'time_zone': 'America/Guyana', 'description': 'America/Guyana (ECT, UTC-0500)'},
-                    {'time_zone': 'Pacific/Kosrae', 'description': 'Pacific/Kosrae (KOST, UTC+1100)'}
+                    {time_zone: 'America/Guyana', description: 'America/Guyana (ECT, UTC-0500)'},
+                    {time_zone: 'Pacific/Kosrae', description: 'Pacific/Kosrae (KOST, UTC+1100)'}
                 ]);
 
                 // expect time zone dropdown to have two subheaders (country/all time zone sub-headers) with new values
@@ -99,10 +101,9 @@ define(['backbone',
                 expect(timeZoneView.$(groupOptionsSelector)[0].value).toBe('America/Guyana');
 
                 // select time zone option from option
-                var timeZoneChange = {'time_zone': 'Pacific/Kosrae'};
                 timeZoneView.$(baseSelector).val(timeZoneChange[timeZoneData.valueAttribute]).change();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, timeZoneChange);
-                AjaxHelpers.respondWithJson(requests, {"success": "true"});
+                AjaxHelpers.respondWithJson(requests, {success: 'true'});
                 timeZoneView.render();
 
                 // expect time zone dropdown to have three subheaders (currently selected/country/all time zones)
@@ -111,7 +112,7 @@ define(['backbone',
                 expect(timeZoneView.$(groupOptionsSelector)[0].value).toBe('Pacific/Kosrae');
             });
 
-            it("sends request to /i18n/setlang/ after changing language preference in LanguagePreferenceFieldView", function() {
+            it('sends request to /i18n/setlang/ after changing language in LanguagePreferenceFieldView', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var selector = '.u-field-value > select';

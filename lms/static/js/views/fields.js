@@ -368,7 +368,7 @@
                 'focusout select': 'finishEditing'
             },
 
-            initialize: function (options) {
+            initialize: function(options) {
                 _.bindAll(this, 'render', 'optionForValue', 'fieldValue', 'displayValue', 'updateValueInField',
                     'saveValue', 'createGroupOptions');
                 this._super(options);
@@ -408,14 +408,14 @@
             },
 
             optionForValue: function(value) {
+                var options = [];
                 if (_.isUndefined(this.options.groupOptions)) {
                     return _.find(this.options.options, function(option) { return option[0] === value; });
                 } else {
-                    var options = [];
-                    _.each(this.options.groupOptions, function (groupOption) {
+                    _.each(this.options.groupOptions, function(groupOption) {
                         options = options.concat(groupOption.selectOptions);
                     });
-                    return _.find(options, function (option) {
+                    return _.find(options, function(option) {
                         return option[0] === value;
                     });
                 }
@@ -496,14 +496,12 @@
                 }
             },
 
-            createGroupOptions: function () {
-                return !(_.isUndefined(this.options.groupOptions)) ?  this.options.groupOptions :
-                [
-                    {
-                        'groupTitle': null,
-                        'selectOptions': this.options.options
-                    }
-                ];
+            createGroupOptions: function() {
+                return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
+                    [{
+                        groupTitle: null,
+                        selectOptions: this.options.options
+                    }];
             }
         });
 

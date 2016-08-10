@@ -2,8 +2,8 @@
 Acceptance Tests for Course Information
 """
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from flaky import flaky
-from base_studio_test import StudioCourseTest
 
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
@@ -11,27 +11,31 @@ from ...pages.studio.index import DashboardPage
 
 @flaky(25, 25)
 class UsersCanAddUpdatesTest(StudioCourseTest):
+    """
+    Series of Bok Choy Tests to test the Course Updates page
+    """
     def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanAddUpdatesTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
-
-        self.course_name = self.course_info['display_name']
-        self.course_org = self.course_info['org']
-        self.course_number = self.course_info['number']
-        self.course_run = self.course_info['run']
-
         self.course_updates_page = CourseUpdatesPage(
             self.browser,
-            self.course_org,
-            self.course_number,
-            self.course_run
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
         )
 
     def test_course_updates_page_exists(self):
+        """
+        Scenario: User can access Course Updates Page
+            Given I have opened a new course in Studio
+            And I go to the course updates page
+            When I visit the page
+            Then I should see any course updates
+            And I should see the new update button
+        """
         self.course_updates_page.visit()
         self.course_updates_page.wait_for_page()
-        self.assertTrue(self.course_updates_page.is_browser_on_page())
         self.assertTrue(self.course_updates_page.are_course_updates_on_page())
         self.assertTrue(self.course_updates_page.is_new_update_button_present)
 
@@ -47,7 +51,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-
         self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
 
@@ -64,7 +67,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-
         self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.assertTrue(self.course_updates_page.is_edit_button_present())
@@ -86,7 +88,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-
         self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.course_updates_page.click_delete_update_button()
@@ -104,7 +105,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-
         self.course_updates_page.submit_update('Hello')
         self.assertTrue(self.course_updates_page.update_text_contains('Hello'))
         self.course_updates_page.click_edit_update_button()
@@ -125,7 +125,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()
-
         self.course_updates_page.submit_update('before <strong>middle</strong> after')
         self.assertTrue(self.course_updates_page.update_text_contains('before <strong>middle</strong> after'))
         self.course_updates_page.visit()
@@ -144,7 +143,6 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
            And when I reload the page
            Then I should see the asset update to "modified.jpg"
         """
-
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_new_update_button_present())
         self.course_updates_page.click_new_update_button()

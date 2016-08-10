@@ -66,9 +66,9 @@ class CourseUpdatesPage(CoursePage):
         Arguments:
             search_date (str): e.g. 06/01/2013 would be found with June 1, 2013
         """
-        dates = self.q(css='.date-display').html
-        for date in dates:
-            if search_date == date:
+        date = self.q(css='.date-display').html
+        if len(date) > 0:
+            if search_date == date[0]:
                 return True
         return False
 

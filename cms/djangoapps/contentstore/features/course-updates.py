@@ -1,9 +1,8 @@
 # pylint: disable=missing-docstring
 
+from cms.djangoapps.contentstore.features.common import type_in_codemirror, get_codemirror_value
 from lettuce import world, step
 from nose.tools import assert_in
-
-from common import type_in_codemirror, get_codemirror_value
 
 
 @step(u'I go to the course updates page')

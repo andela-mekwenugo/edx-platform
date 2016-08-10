@@ -2,12 +2,14 @@
 Acceptance Tests for Course Information
 """
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
-
+from flaky import flaky
 from base_studio_test import StudioCourseTest
+
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
 
 
+@flaky(25, 25)
 class UsersCanAddUpdatesTest(StudioCourseTest):
     def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanAddUpdatesTest, self).setUp()

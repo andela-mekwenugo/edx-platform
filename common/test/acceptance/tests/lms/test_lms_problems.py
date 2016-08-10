@@ -479,8 +479,8 @@ class CAPAProblemA11yBaseTestMixin(object):
 
 
 @attr('a11y')
-class CAPAProblemQuestionDescriptionA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
-    """TestCase Class to verify CAPA problem questions accessibility."""
+class CAPAProblemChoiceA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """TestCase Class to verify accessibility for checkboxes and multiplechoice CAPA problems."""
 
     def get_problem(self):
         """

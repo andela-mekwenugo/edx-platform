@@ -14,40 +14,40 @@
     <div style="display:none;" name="${hidden}" inputid="input_${id}" />
 % endif
 
-    <label class="question-label" for="input_${id}">${response_data['label']}</label>
+<label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-    <input type="text" name="input_${id}" id="input_${id}" ${describedby} value="${value|h}"
-        % if do_math:
-            class="math"
-        % endif
-        % if size:
-            size="${size}"
-        % endif
-        % if hidden:
-            style="display:none;"
-        % endif
-    />
-    ${trailing_text | h}
+<input type="text" name="input_${id}" id="input_${id}" ${describedby} value="${value|h}"
+    % if do_math:
+        class="math"
+    % endif
+    % if size:
+        size="${size}"
+    % endif
+    % if hidden:
+        style="display:none;"
+    % endif
+/>
+${trailing_text | h}
 
-    <span class="status"
-        %if status != 'unsubmitted':
-        %endif
-        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+<span class="status"
+    %if status != 'unsubmitted':
+    %endif
+    aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
 
-        <span class="sr">
-          %if value:
-            ${value|h}
-          % else:
-            ${response_data['label']}
-          %endif
-            -
-            ${status.display_name}
-        </span>
+    <span class="sr">
+      %if value:
+        ${value|h}
+      % else:
+        ${response_data['label']}
+      %endif
+        -
+        ${status.display_name}
     </span>
+</span>
 
-    <p id="answer_${id}" class="answer"></p>
+<p id="answer_${id}" class="answer"></p>
 
 % if do_math:
     <div id="display_${id}" class="equation">`{::}`</div>

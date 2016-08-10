@@ -461,7 +461,7 @@ class TextlineTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        self.assert_has_xpath(xml, "//label[@class='question-label']", self.RESPONSE_DATA['label'])
+        self.assert_has_xpath(xml, "//label[@class='problem-group-label']", self.RESPONSE_DATA['label'])
 
     def test_hidden(self):
         self.context['hidden'] = True
